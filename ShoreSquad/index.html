@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ShoreSquad - Rally your crew, track weather, and hit the next beach cleanup with our dope map app!">
+    <title>ShoreSquad - Beach Cleanup Mobilized</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Navigation Header -->
+    <header class="navbar">
+        <div class="container">
+            <div class="logo">
+                <h1>🌊 ShoreSquad</h1>
+            </div>
+            <nav class="nav-menu">
+                <ul>
+                    <li><a href="#home" class="nav-link">Home</a></li>
+                    <li><a href="#map" class="nav-link">Map</a></li>
+                    <li><a href="#weather" class="nav-link">Weather</a></li>
+                    <li><a href="#crew" class="nav-link">My Crew</a></li>
+                    <li><a href="#about" class="nav-link">About</a></li>
+                </ul>
+            </nav>
+            <button class="menu-toggle" aria-label="Toggle menu">☰</button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h2>Rally Your Crew</h2>
+            <p>Track weather. Plan cleanups. Make eco-action fun.</p>
+            <button class="btn btn-primary" id="cta-button">Start a Cleanup</button>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <h2>Why ShoreSquad?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <span class="feature-icon">📍</span>
+                    <h3>Smart Maps</h3>
+                    <p>Find beaches near you and coordinate with your crew in real-time.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">⛅</span>
+                    <h3>Weather Tracking</h3>
+                    <p>Check conditions before heading out to ensure safe, optimal cleanup days.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">👥</span>
+                    <h3>Community Crew</h3>
+                    <p>Invite friends, join teams, and celebrate collective impact.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">📊</span>
+                    <h3>Impact Tracking</h3>
+                    <p>See how much plastic you've removed and inspire others.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Map Section -->
+    <section id="map" class="map-section">
+        <div class="container">
+            <h2>Find Your Beach</h2>
+            <div id="map-container" class="map-container">
+                <p class="placeholder">🗺️ Interactive map will load here</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Weather Section -->
+    <section id="weather" class="weather-section">
+        <div class="container">
+            <h2>Check Weather</h2>
+            <div class="weather-widget">
+                <input type="text" id="location-input" placeholder="Enter beach name..." aria-label="Search beach location">
+                <button id="search-weather" class="btn btn-secondary">Search Weather</button>
+            </div>
+            <div id="weather-results" class="weather-results">
+                <p class="placeholder">Enter a location to see weather data</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Crew Section -->
+    <section id="crew" class="crew-section">
+        <div class="container">
+            <h2>Your Crew</h2>
+            <div class="crew-container">
+                <div class="crew-stats">
+                    <div class="stat">
+                        <span class="stat-number" id="crew-count">0</span>
+                        <span class="stat-label">Crew Members</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number" id="cleanups-count">0</span>
+                        <span class="stat-label">Cleanups Planned</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number" id="impact-count">0</span>
+                        <span class="stat-label">Kg Removed</span>
+                    </div>
+                </div>
+                <button class="btn btn-primary" id="invite-crew">Invite Crew Member</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about-section">
+        <div class="container">
+            <h2>About ShoreSquad</h2>
+            <p>ShoreSquad mobilizes young people to clean beaches by combining weather tracking, interactive maps, and social features. We believe eco-action should be fun, connected, and impactful.</p>
+            <p><strong>Our Mission:</strong> To make beach cleanups accessible, enjoyable, and community-driven.</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 ShoreSquad. Making our oceans cleaner, one crew at a time. 🌊</p>
+        </div>
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

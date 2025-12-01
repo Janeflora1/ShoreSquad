@@ -1,0 +1,457 @@
+/**
+ * ShoreSquad - Main Application JavaScript
+ * Features: Interactivity, Performance Optimization, and Progressive Enhancement
+ */
+
+// ===========================
+// PERFORMANCE OPTIMIZATION
+// ===========================
+
+// Debounce utility for optimized event handling
+function debounce(func, delay) {
+    let timeoutId;
+    return function (...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func(...args), delay);
+    };
+}
+
+// Throttle utility for smooth scroll/resize events
+function throttle(func, limit) {
+    let inThrottle;
+    return function (...args) {
+        if (!inThrottle) {
+            func(...args);
+            inThrottle = true;
+            setTimeout(() => inThrottle = false, limit);
+        }
+    };
+}
+
+// Lazy loading for images (future enhancement)
+function observeElements() {
+    if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const element = entry.target;
+                    element.classList.add('loaded');
+                    observer.unobserve(element);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('[data-lazy]').forEach(el => observer.observe(el));
+    }
+}
+
+// ===========================
+// STATE MANAGEMENT
+// ===========================
+
+const appState = {
+    crew: [],
+    cleanups: [],
+    totalImpact: 0,
+    userLocation: null,
+    weatherData: {},
+
+    // Initialize app
+    init() {
+        this.loadFromLocalStorage();
+        this.updateUI();
+    },
+
+    // Load data from localStorage
+    loadFromLocalStorage() {
+        const saved = localStorage.getItem('shoreSquadData');
+        if (saved) {
+            const data = JSON.parse(saved);
+            Object.assign(this, data);
+        }
+    },
+
+    // Save data to localStorage
+    save() {
+        localStorage.setItem('shoreSquadData', JSON.stringify({
+            crew: this.crew,
+            cleanups: this.cleanups,
+            totalImpact: this.totalImpact
+        }));
+    },
+
+    // Add crew member
+    addCrewMember(name, email) {
+        const member = {
+            id: Date.now(),
+            name,
+            email,
+            joinedAt: new Date().toISOString()
+        };
+        this.crew.push(member);
+        this.save();
+        return member;
+    },
+
+    // Add cleanup event
+    addCleanup(location, date, expectedMembers) {
+        const cleanup = {
+            id: Date.now(),
+            location,
+            date,
+            expectedMembers,
+            actualMembers: 0,
+            impactKg: 0,
+            createdAt: new Date().toISOString()
+        };
+        this.cleanups.push(cleanup);
+        this.save();
+        return cleanup;
+    },
+
+    // Update impact
+    updateImpact(kg) {
+        this.totalImpact += kg;
+        this.save();
+    },
+
+    // Update UI elements
+    updateUI() {
+        document.getElementById('crew-count').textContent = this.crew.length;
+        document.getElementById('cleanups-count').textContent = this.cleanups.length;
+        document.getElementById('impact-count').textContent = Math.round(this.totalImpact);
+    }
+};
+
+// ===========================
+// DOM INTERACTIONS
+// ===========================
+
+// Navigation scroll spy (optional active state)
+function setupNavigation() {
+    const navLinks = document.querySelectorAll('.nav-link');
+    
+    window.addEventListener('scroll', throttle(() => {
+        let current = '';
+        
+        document.querySelectorAll('section').forEach(section => {
+            const sectionTop = section.offsetTop;
+            if (scrollY >= sectionTop - 200) {
+                current = section.getAttribute('id');
+            }
+        });
+
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href').slice(1) === current) {
+                link.classList.add('active');
+            }
+        });
+    }, 100));
+}
+
+// CTA Button Handler
+function setupCTAButton() {
+    const ctaBtn = document.getElementById('cta-button');
+    if (ctaBtn) {
+        ctaBtn.addEventListener('click', () => {
+            const locationInput = prompt('Enter beach location:');
+            if (locationInput) {
+                const dateInput = prompt('Enter cleanup date (YYYY-MM-DD):');
+                if (dateInput) {
+                    appState.addCleanup(locationInput, dateInput, 5);
+                    appState.updateUI();
+                    showNotification(`Cleanup planned at ${locationInput}!`, 'success');
+                }
+            }
+        });
+    }
+}
+
+// Invite Crew Handler
+function setupInviteCrew() {
+    const inviteBtn = document.getElementById('invite-crew');
+    if (inviteBtn) {
+        inviteBtn.addEventListener('click', () => {
+            const name = prompt('Enter crew member name:');
+            if (name) {
+                const email = prompt('Enter crew member email:');
+                if (email) {
+                    appState.addCrewMember(name, email);
+                    appState.updateUI();
+                    showNotification(`${name} added to your crew!`, 'success');
+                }
+            }
+        });
+    }
+}
+
+// Weather Search Handler
+function setupWeatherSearch() {
+    const searchBtn = document.getElementById('search-weather');
+    const locationInput = document.getElementById('location-input');
+    
+    if (searchBtn && locationInput) {
+        const handleSearch = () => {
+            const location = locationInput.value.trim();
+            if (location) {
+                fetchWeatherData(location);
+            } else {
+                showNotification('Please enter a location', 'error');
+            }
+        };
+
+        searchBtn.addEventListener('click', handleSearch);
+        locationInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleSearch();
+        });
+    }
+}
+
+// ===========================
+// WEATHER INTEGRATION
+// ===========================
+
+async function fetchWeatherData(location) {
+    try {
+        showNotification('Fetching weather data...', 'info');
+        
+        // Using Open-Meteo free API (no API key needed)
+        const geocodeUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(location)}&count=1&language=en&format=json`;
+        
+        const geoResponse = await fetch(geocodeUrl);
+        const geoData = await geoResponse.json();
+
+        if (!geoData.results || geoData.results.length === 0) {
+            showNotification('Location not found', 'error');
+            return;
+        }
+
+        const { latitude, longitude, name, country } = geoData.results[0];
+        
+        // Get weather data
+        const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,weather_code&temperature_unit=celsius&timezone=auto`;
+        
+        const weatherResponse = await fetch(weatherUrl);
+        const weatherData = await weatherResponse.json();
+
+        displayWeatherData(weatherData, name, country);
+        showNotification('Weather data loaded!', 'success');
+    } catch (error) {
+        console.error('Weather fetch error:', error);
+        showNotification('Failed to fetch weather data', 'error');
+    }
+}
+
+function displayWeatherData(data, location, country) {
+    const resultsContainer = document.getElementById('weather-results');
+    
+    const current = data.current;
+    const daily = data.daily;
+    
+    let html = `
+        <div class="weather-info">
+            <h3>${location}, ${country}</h3>
+            <div class="current-weather">
+                <p><strong>Temperature:</strong> ${current.temperature_2m}°C</p>
+                <p><strong>Humidity:</strong> ${current.relative_humidity_2m}%</p>
+                <p><strong>Wind Speed:</strong> ${current.wind_speed_10m} km/h</p>
+            </div>
+            <h4>7-Day Forecast</h4>
+            <div class="forecast-grid">
+    `;
+
+    for (let i = 0; i < 7; i++) {
+        html += `
+            <div class="forecast-day">
+                <p><strong>${new Date(daily.time[i]).toDateString()}</strong></p>
+                <p>High: ${daily.temperature_2m_max[i]}°C</p>
+                <p>Low: ${daily.temperature_2m_min[i]}°C</p>
+                <p>Rain: ${daily.precipitation_sum[i]}mm</p>
+            </div>
+        `;
+    }
+
+    html += `
+            </div>
+        </div>
+    `;
+
+    resultsContainer.innerHTML = html;
+}
+
+// ===========================
+// NOTIFICATIONS
+// ===========================
+
+function showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.textContent = message;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 1rem 1.5rem;
+        background-color: ${getNotificationColor(type)};
+        color: white;
+        border-radius: 8px;
+        z-index: 1000;
+        animation: slideIn 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    `;
+
+    document.body.appendChild(notification);
+
+    // Remove after 4 seconds
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+    }, 4000);
+}
+
+function getNotificationColor(type) {
+    const colors = {
+        success: '#2ecc71',
+        error: '#e74c3c',
+        info: '#3498db',
+        warning: '#f39c12'
+    };
+    return colors[type] || colors.info;
+}
+
+// ===========================
+// ANIMATIONS
+// ===========================
+
+// Add CSS animations dynamically
+function addAnimations() {
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+// ===========================
+// MOBILE MENU TOGGLE
+// ===========================
+
+function setupMobileMenu() {
+    const menuToggle = document.querySelector('.menu-toggle');
+    const navMenu = document.querySelector('.nav-menu');
+
+    if (menuToggle && navMenu) {
+        menuToggle.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+            menuToggle.textContent = navMenu.classList.contains('active') ? '✕' : '☰';
+        });
+
+        // Close menu when nav link is clicked
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                navMenu.classList.remove('active');
+                menuToggle.textContent = '☰';
+            });
+        });
+    }
+}
+
+// ===========================
+// GEOLOCATION
+// ===========================
+
+function setupGeolocation() {
+    if ('geolocation' in navigator) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                appState.userLocation = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+                console.log('User location detected:', appState.userLocation);
+                // Future: Use for map centering and nearby beach detection
+            },
+            (error) => {
+                console.log('Geolocation permission denied or unavailable', error);
+            }
+        );
+    }
+}
+
+// ===========================
+// APP INITIALIZATION
+// ===========================
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize app state
+    appState.init();
+
+    // Setup features
+    addAnimations();
+    setupNavigation();
+    setupCTAButton();
+    setupInviteCrew();
+    setupWeatherSearch();
+    setupMobileMenu();
+    setupGeolocation();
+    observeElements();
+
+    console.log('ShoreSquad app initialized successfully!');
+});
+
+// ===========================
+// SERVICE WORKER REGISTRATION (PWA support - future)
+// ===========================
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        // Service worker registration would go here
+        console.log('Service Worker support detected');
+    });
+}
+
+// ===========================
+// KEYBOARD ACCESSIBILITY
+// ===========================
+
+document.addEventListener('keydown', (e) => {
+    // Escape key to close menus
+    if (e.key === 'Escape') {
+        const navMenu = document.querySelector('.nav-menu');
+        if (navMenu && navMenu.classList.contains('active')) {
+            navMenu.classList.remove('active');
+            document.querySelector('.menu-toggle').textContent = '☰';
+        }
+    }
+});
