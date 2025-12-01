@@ -30,36 +30,36 @@
     <!-- Hero Section -->
     <section id="home" class="hero">
         <div class="hero-content">
-            <h2>Rally Your Crew</h2>
-            <p>Track weather. Plan cleanups. Make eco-action fun.</p>
-            <button class="btn btn-primary" id="cta-button">Start a Cleanup</button>
+            <h2>🌊 Rally Your Crew, Lah! 🌊</h2>
+            <p>Track weather. Plan cleanups. Make eco-action fun, lor!</p>
+            <button class="btn btn-primary" id="cta-button">🏄‍♂️ Start a Cleanup</button>
         </div>
     </section>
 
     <!-- Features Section -->
     <section id="features" class="features">
         <div class="container">
-            <h2>Why ShoreSquad?</h2>
+            <h2>Why ShoreSquad? 🎉</h2>
             <div class="features-grid">
                 <div class="feature-card">
-                    <span class="feature-icon">📍</span>
+                    <span class="feature-icon">🗺️</span>
                     <h3>Smart Maps</h3>
-                    <p>Find beaches near you and coordinate with your crew in real-time.</p>
+                    <p>Find beaches near you and coordinate with your crew in real-time, lor!</p>
                 </div>
                 <div class="feature-card">
-                    <span class="feature-icon">⛅</span>
-                    <h3>Weather Tracking</h3>
-                    <p>Check conditions before heading out to ensure safe, optimal cleanup days.</p>
+                    <span class="feature-icon">☀️</span>
+                    <h3>Weather Vibes</h3>
+                    <p>Check conditions before heading out for safe, optimal cleanup days, lah!</p>
                 </div>
                 <div class="feature-card">
-                    <span class="feature-icon">👥</span>
-                    <h3>Community Crew</h3>
-                    <p>Invite friends, join teams, and celebrate collective impact.</p>
+                    <span class="feature-icon">🤝</span>
+                    <h3>Squad Chat</h3>
+                    <p>Invite friends, join teams, and celebrate collective impact together!</p>
                 </div>
                 <div class="feature-card">
-                    <span class="feature-icon">📊</span>
-                    <h3>Impact Tracking</h3>
-                    <p>See how much plastic you've removed and inspire others.</p>
+                    <span class="feature-icon">♻️</span>
+                    <h3>Impact Score</h3>
+                    <p>See how much plastic you've removed and inspire others, sia!</p>
                 </div>
             </div>
         </div>
@@ -68,11 +68,25 @@
     <!-- Map Section -->
     <section id="map" class="map-section">
         <div class="container">
-            <h2>Find Your Beach</h2>
+            <h2>🗺️ Find Your Beach, Lah!</h2>
             <div id="map-container" class="map-container">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.789234567!2d103.955574!3d1.381497!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31da1c1c1c1c1c1d%3A0x1c1c1c1c1c1c1c1c!2sStreet%20View%20Asia!5e0!3m2!1sen!2ssg!4v1234567890" width="100%" height="500" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-                <h3 style="margin-top: 20px; text-align: center;">📍 Next Cleanup: Pasir Ris</h3>
-                <p style="text-align: center; color: #666;">Location: 1.381497, 103.955574</p>
+                <!-- Cleanup Spots Selection -->
+                <div style="margin-bottom: 20px; text-align: center;">
+                    <p style="font-size: 14px; color: #666; margin-bottom: 10px;">Select a cleanup spot:</p>
+                    <select id="beach-selector" style="padding: 10px; border-radius: 5px; border: 2px solid #0066cc; font-size: 14px;">
+                        <option value="pasir-ris">🏄‍♂️ Pasir Ris Park (Recommended)</option>
+                        <option value="sentosa">🏝️ Sentosa Beach</option>
+                        <option value="east-coast">🌊 East Coast Park</option>
+                        <option value="changi">☂️ Changi Beach</option>
+                    </select>
+                </div>
+                <iframe id="map-iframe" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.789234567!2d103.955574!3d1.381497!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31da1c1c1c1c1c1d%3A0x1c1c1c1c1c1c1c1c!2sStreet%20View%20Asia!5e0!3m2!1sen!2ssg!4v1234567890" width="100%" height="500" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                <div style="margin-top: 20px; padding: 15px; background: #f0f7ff; border-radius: 8px; text-align: center;">
+                    <h3 style="margin: 0 0 10px 0;">📍 Next Cleanup: Pasir Ris Park</h3>
+                    <p style="color: #666; margin: 5px 0;"><strong>Coordinates:</strong> 1.381497°N, 103.955574°E</p>
+                    <p style="color: #666; margin: 5px 0;"><strong>Best Time:</strong> Early morning (6-8 AM), lor!</p>
+                    <p style="color: #0066cc; margin: 5px 0;"><strong>Recent Impact:</strong> 45kg removed last month, sia! 🎉</p>
+                </div>
             </div>
         </div>
     </section>
@@ -81,12 +95,14 @@
     <!-- Weather Section -->
     <section id="weather" class="weather-section">
         <div class="container">
-            <h2>4-Day Weather Forecast</h2>
+            <h2>☀️ Weather Vibes for Your Beach Day</h2>
             <div class="weather-widget">
-                <button id="load-weather" class="btn btn-primary">Load Weather Forecast</button>
+                <p style="margin-bottom: 15px; color: #666; font-size: 14px;">📍 Singapore weather - updated real-time from NEA, lah!</p>
+                <button id="load-weather" class="btn btn-primary">🌡️ Load 4-Day Forecast</button>
+                <p style="margin-top: 10px; font-size: 12px; color: #999;">Updated every 3 hours • Metrics in °C & km/h</p>
             </div>
             <div id="weather-results" class="weather-results">
-                <p class="placeholder">Click "Load Weather Forecast" to see Singapore's 4-day weather</p>
+                <p class="placeholder">🌊 Click "Load 4-Day Forecast" to check if the weather's shiok or not! 🏖️</p>
             </div>
         </div>
     </section>
@@ -94,12 +110,12 @@
     <!-- Crew Section -->
     <section id="crew" class="crew-section">
         <div class="container">
-            <h2>Your Crew</h2>
+            <h2>🤝 Your Squad, Lah!</h2>
             <div class="crew-container">
                 <div class="crew-stats">
                     <div class="stat">
                         <span class="stat-number" id="crew-count">0</span>
-                        <span class="stat-label">Crew Members</span>
+                        <span class="stat-label">Squad Members</span>
                     </div>
                     <div class="stat">
                         <span class="stat-number" id="cleanups-count">0</span>
@@ -107,10 +123,24 @@
                     </div>
                     <div class="stat">
                         <span class="stat-number" id="impact-count">0</span>
-                        <span class="stat-label">Kg Removed</span>
+                        <span class="stat-label">♻️ Kg Removed</span>
                     </div>
                 </div>
-                <button class="btn btn-primary" id="invite-crew">Invite Crew Member</button>
+                <div style="margin-top: 20px; padding: 15px; background: #f0f7ff; border-radius: 8px;">
+                    <h3 style="margin-top: 0;">📊 Impact Tracker</h3>
+                    <div id="impact-tracker" style="margin-top: 10px;">
+                        <div style="margin: 10px 0; padding: 10px; background: white; border-radius: 5px; border-left: 4px solid #2ecc71;">
+                            <strong>🏖️ East Coast Park</strong> - 10kg removed (Updated today) ✅
+                        </div>
+                        <div style="margin: 10px 0; padding: 10px; background: white; border-radius: 5px; border-left: 4px solid #2ecc71;">
+                            <strong>🏝️ Sentosa Beach</strong> - 15kg removed (Last week) ✅
+                        </div>
+                        <div style="margin: 10px 0; padding: 10px; background: white; border-radius: 5px; border-left: 4px solid #2ecc71;">
+                            <strong>🏄‍♂️ Pasir Ris</strong> - 20kg removed (This month) ✅
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" id="invite-crew" style="margin-top: 15px;">👥 Invite Crew Member</button>
             </div>
         </div>
     </section>
@@ -118,9 +148,15 @@
     <!-- About Section -->
     <section id="about" class="about-section">
         <div class="container">
-            <h2>About ShoreSquad</h2>
-            <p>ShoreSquad mobilizes young people to clean beaches by combining weather tracking, interactive maps, and social features. We believe eco-action should be fun, connected, and impactful.</p>
-            <p><strong>Our Mission:</strong> To make beach cleanups accessible, enjoyable, and community-driven.</p>
+            <h2>🌍 About ShoreSquad, Lah!</h2>
+            <p>ShoreSquad mobilizes young people to clean beaches by combining weather tracking, interactive maps, and social features. We believe eco-action should be fun, connected, and impactful, lor!</p>
+            <p><strong>🏄‍♂️ Our Mission:</strong> To make beach cleanups accessible, enjoyable, and community-driven—one squad at a time, sia! 🌊</p>
+            <p><strong>💡 Why We Started:</strong> Singapore's beaches are amazing, but they need our help! Join the movement to keep them clean and beautiful for future generations. Together, we're making a difference! 🌍✨</p>
+            <div style="margin-top: 20px; padding: 15px; background: #f0f7ff; border-radius: 8px;">
+                <h3 style="margin-top: 0;">💬 Squad Chat Support</h3>
+                <p style="color: #666; margin: 10px 0;">Questions? Feedback? Got a beach cleanup idea? Chat with us using the Tawk.to widget below! Our team is here to help, lor! 👋</p>
+                <p style="color: #999; font-size: 12px; margin: 10px 0;">Available 24/7 for all your ShoreSquad questions—questions about weather, maps, or how to organize your first cleanup!</p>
+            </div>
         </div>
     </section>
 
@@ -132,5 +168,27 @@
     </footer>
 
     <script src="js/app.js"></script>
+    
+    <!-- Tawk.to Chat Widget for Squad Support -->
+    <!-- Customize propertyId with your Tawk.to account: https://tawk.to/ -->
+    <script type="text/javascript">
+        var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+        (function(){
+            var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+            s1.async=true;
+            s1.src='https://embed.tawk.to/675cf5c5cebbb1e7ba0eb9ff/1iio4d4fl';
+            s1.charset='UTF-8';
+            s1.setAttribute('crossorigin','*');
+            s0.parentNode.insertBefore(s1,s0);
+        })();
+        
+        // Customize Tawk.to to feel like ShoreSquad
+        if (typeof Tawk_API !== 'undefined') {
+            Tawk_API.onLoad = function() {
+                console.log('ShoreSquad Squad Chat ready! 💬');
+            };
+        }
+    </script>
+    <!-- End Tawk.to Code -->
 </body>
 </html>
