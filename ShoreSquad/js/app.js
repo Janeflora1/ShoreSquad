@@ -1135,4 +1135,192 @@ document.addEventListener('DOMContentLoaded', () => {
     updateSquadMembersList();
     updateCleanupsList();
     updateImpactTrackerDetails();
+    setupCleanupForm();
+    setupMemberForm();
+    setupModalControls();
 });
+
+// ===========================
+// CLEANUP FORM HANDLING
+// ===========================
+
+function setupCleanupForm() {
+    const form = document.getElementById('cleanup-form');
+    const submit = form.querySelector('button[type="submit"]');
+    
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const beach = document.getElementById('beach-select').value;
+        const date = document.getElementById('cleanup-date').value;
+        const members = parseInt(document.getElementById('cleanup-members').value);
+        const kg = parseFloat(document.getElementById('cleanup-kg').value);
+        
+        if (!beach || !date || !members || kg === null) {
+            showNotification('Please fill in all fields', 'error');
+            return;
+        }
+        
+        // Add cleanup to app state
+        appState.cleanups.push({
+            location: beach,
+            date: date,
+            kg: kg,
+            members: members
+        });
+        
+        // Update total impact
+        appState.totalImpact += kg;
+        appState.save();
+        
+        // Update UI
+        appState.updateUI();
+        
+        // Show success
+        showNotification(`✅ Cleanup logged at ${beach} with ${kg}kg removed!`, 'success');
+        
+        // Reset form and close modal
+        form.reset();
+        closeModal('cleanup-modal');
+    });
+}
+
+function setupMemberForm() {
+    const form = document.getElementById('member-form');
+    
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const name = document.getElementById('member-name').value.trim();
+        const role = document.getElementById('member-role').value;
+        
+        if (!name || !role) {
+            showNotification('Please fill in all fields', 'error');
+            return;
+        }
+        
+        // Add member to app state
+        appState.addCrewMember(name, role);
+        
+        // Update UI
+        appState.updateUI();
+        
+        // Show success
+        showNotification(`✅ ${name} added to your crew as ${role}!`, 'success');
+        
+        // Reset form and close modal
+        form.reset();
+        closeModal('member-modal');
+    });
+}
+
+function setupModalControls() {
+    // Cleanup Modal
+    document.getElementById('start-cleanup').addEventListener('click', () => openModal('cleanup-modal'));
+    document.getElementById('close-cleanup-modal').addEventListener('click', () => closeModal('cleanup-modal'));
+    document.getElementById('cancel-cleanup').addEventListener('click', () => closeModal('cleanup-modal'));
+    
+    // Member Modal
+    document.getElementById('invite-crew').addEventListener('click', () => openModal('member-modal'));
+    document.getElementById('close-member-modal').addEventListener('click', () => closeModal('member-modal'));
+    document.getElementById('cancel-member').addEventListener('click', () => closeModal('member-modal'));
+    
+    // Close modal when clicking outside
+    document.getElementById('cleanup-modal').addEventListener('click', (e) => {
+        if (e.target.id === 'cleanup-modal') closeModal('cleanup-modal');
+    });
+    
+    document.getElementById('member-modal').addEventListener('click', (e) => {
+        if (e.target.id === 'member-modal') closeModal('member-modal');
+    });
+    
+    // Set today's date as default in cleanup form
+    const dateInput = document.getElementById('cleanup-date');
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.value = today;
+}
+
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+// ===========================
+// MONTHLY IMPACT TRACKER
+// ===========================
+
+function updateImpactTrackerDetails() {
+    const impactDetails = document.getElementById('impact-tracker-details');
+    impactDetails.innerHTML = '';
+    
+    // Group cleanups by month-year
+    const monthlyData = {};
+    
+    appState.cleanups.forEach((cleanup) => {
+        const date = new Date(cleanup.date);
+        const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        
+        if (!monthlyData[monthYear]) {
+            monthlyData[monthYear] = {
+                year: date.getFullYear(),
+                month: date.getMonth(),
+                kg: 0,
+                cleanups: 0
+            };
+        }
+        
+        monthlyData[monthYear].kg += cleanup.kg;
+        monthlyData[monthYear].cleanups += 1;
+    });
+    
+    // Sort by date (newest first)
+    const sortedMonths = Object.entries(monthlyData).sort((a, b) => b[0].localeCompare(a[0]));
+    
+    if (sortedMonths.length === 0) {
+        impactDetails.innerHTML = '<p style="color: #999; grid-column: 1/-1; text-align: center; padding: 2rem;">No impact tracked yet. Log your first cleanup to see monthly statistics! 📊</p>';
+        return;
+    }
+    
+    // Create wrapper for monthly grid
+    const monthlyGrid = document.createElement('div');
+    monthlyGrid.className = 'monthly-impact-grid';
+    
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    
+    sortedMonths.forEach(([monthYear, data]) => {
+        const impactCard = document.createElement('div');
+        impactCard.className = 'monthly-impact-card';
+        
+        const monthName = monthNames[data.month];
+        
+        impactCard.innerHTML = `
+            <div class="month-year-header">${monthName} ${data.year}</div>
+            <div class="month-kg">${data.kg.toFixed(1)}<span class="month-kg-unit">kg</span></div>
+            <div class="month-cleanups">📅 ${data.cleanups} cleanup${data.cleanups !== 1 ? 's' : ''}</div>
+        `;
+        monthlyGrid.appendChild(impactCard);
+    });
+    
+    impactDetails.appendChild(monthlyGrid);
+}
+
+// Update appState.addCrewMember to accept role
+const originalAddCrewMember = appState.addCrewMember.bind(appState);
+appState.addCrewMember = function(name, role) {
+    const member = {
+        id: Date.now(),
+        name,
+        role: role || 'Member',
+        joinedAt: new Date().toISOString()
+    };
+    this.crew.push(member);
+    this.save();
+    return member;
+};

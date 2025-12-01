@@ -169,10 +169,92 @@
                     </div>
                 </div>
                 
-                <button class="btn btn-primary" id="invite-crew" style="margin-top: 15px;">👥 Invite Crew Member</button>
+                <div class="action-buttons" style="display: flex; gap: 1rem; margin-top: 2rem; flex-wrap: wrap;">
+                    <button class="btn btn-primary" id="start-cleanup">🏖️ Start a Cleanup</button>
+                    <button class="btn btn-secondary" id="invite-crew">👥 Add Crew Member</button>
+                </div>
             </div>
         </div>
     </section>
+    
+    <!-- START CLEANUP MODAL -->
+    <div id="cleanup-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🏖️ Start a Cleanup</h3>
+                <button class="modal-close-btn" id="close-cleanup-modal">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="cleanup-form">
+                    <div class="form-group">
+                        <label for="beach-select">🏖️ Select Beach</label>
+                        <select id="beach-select" required>
+                            <option value="">-- Choose a beach --</option>
+                            <option value="East Coast Park">🏖️ East Coast Park</option>
+                            <option value="Sentosa Beach">🏝️ Sentosa Beach</option>
+                            <option value="Pasir Ris Park">🏄‍♂️ Pasir Ris Park</option>
+                            <option value="Changi Beach">🌊 Changi Beach</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="cleanup-date">📅 Cleanup Date</label>
+                        <input type="date" id="cleanup-date" required>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="cleanup-members">👥 Members Involved</label>
+                            <input type="number" id="cleanup-members" min="1" max="50" placeholder="e.g., 5" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cleanup-kg">♻️ KG Removed</label>
+                            <input type="number" id="cleanup-kg" min="0" max="500" step="0.5" placeholder="e.g., 15" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">✅ Log Cleanup</button>
+                        <button type="button" class="btn btn-secondary" id="cancel-cleanup">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ADD CREW MEMBER MODAL -->
+    <div id="member-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>👥 Add Crew Member</h3>
+                <button class="modal-close-btn" id="close-member-modal">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="member-form">
+                    <div class="form-group">
+                        <label for="member-name">👤 Member Name</label>
+                        <input type="text" id="member-name" placeholder="e.g., Alex Chen" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="member-role">🎯 Role</label>
+                        <select id="member-role" required>
+                            <option value="">-- Choose a role --</option>
+                            <option value="Crew Leader">👨‍💼 Crew Leader</option>
+                            <option value="Coordinator">👩‍💼 Coordinator</option>
+                            <option value="Member">👤 Member</option>
+                            <option value="Volunteer">🙋 Volunteer</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">✅ Add Member</button>
+                        <button type="button" class="btn btn-secondary" id="cancel-member">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <!-- About Section -->
     <section id="about" class="about-section">
