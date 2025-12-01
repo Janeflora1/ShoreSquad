@@ -190,6 +190,136 @@ function setupInviteCrew() {
 // NOTIFICATIONS
 // ===========================
 
+// ===========================
+// NEA WEATHER INTEGRATION
+// ===========================
+
+/**
+ * Fetch 4-day weather forecast from NEA API (data.gov.sg)
+ */
+async function fetchNEAWeatherForecast() {
+    try {
+        showNotification('Loading weather forecast...', 'info');
+        
+        const apiUrl = 'https://api.data.gov.sg/v1/environment/4-day-weather-forecast';
+        
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            throw new Error('Failed to fetch weather data');
+        }
+        
+        const weatherData = await response.json();
+        displayNEAWeatherForecast(weatherData);
+        showNotification('Weather forecast loaded!', 'success');
+    } catch (error) {
+        console.error('Weather fetch error:', error);
+        showNotification('Failed to load weather forecast', 'error');
+    }
+}
+
+/**
+ * Display NEA 4-day weather forecast in a formatted card layout
+ */
+function displayNEAWeatherForecast(data) {
+    const resultsContainer = document.getElementById('weather-results');
+    
+    if (!data.items || data.items.length === 0) {
+        resultsContainer.innerHTML = '<p class="error">No weather data available</p>';
+        return;
+    }
+    
+    const forecastItem = data.items[0];
+    const forecasts = forecastItem.forecasts || [];
+    
+    let html = `
+        <div class="weather-info">
+            <p class="weather-updated">Last updated: ${new Date(forecastItem.update_timestamp).toLocaleString('en-SG')}</p>
+            <div class="forecast-grid">
+    `;
+    
+    forecasts.forEach((day, index) => {
+        const dateObj = new Date(day.timestamp);
+        const dayName = dateObj.toLocaleDateString('en-SG', { weekday: 'short', month: 'short', day: 'numeric' });
+        
+        // Extract temperature values (handle both high/low or single values)
+        const tempHigh = day.temperature?.high || 'N/A';
+        const tempLow = day.temperature?.low || 'N/A';
+        
+        // Extract humidity values
+        const humidityHigh = day.relative_humidity?.high || 'N/A';
+        const humidityLow = day.relative_humidity?.low || 'N/A';
+        
+        // Extract wind data
+        const windHigh = day.wind?.speed?.high || 'N/A';
+        const windLow = day.wind?.speed?.low || 'N/A';
+        const windDir = day.wind?.direction || 'N/A';
+        
+        // Get emoji based on forecast text
+        const weatherEmoji = getWeatherEmoji(day.forecast);
+        
+        html += `
+            <div class="forecast-day">
+                <div class="forecast-date">${dayName}</div>
+                <div class="forecast-icon">${weatherEmoji}</div>
+                <div class="forecast-condition">${day.forecast}</div>
+                <div class="forecast-details">
+                    <div class="detail-item">
+                        <span class="detail-label">🌡️ Temp:</span>
+                        <span class="detail-value">${tempHigh}°C - ${tempLow}°C</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">💧 Humidity:</span>
+                        <span class="detail-value">${humidityHigh}% - ${humidityLow}%</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">💨 Wind:</span>
+                        <span class="detail-value">${windLow}-${windHigh} km/h ${windDir}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    html += `
+            </div>
+        </div>
+    `;
+    
+    resultsContainer.innerHTML = html;
+}
+
+/**
+ * Map weather forecast text to appropriate emoji
+ */
+function getWeatherEmoji(forecastText) {
+    const text = forecastText.toLowerCase();
+    
+    if (text.includes('thundery') || text.includes('lightning')) return '⛈️';
+    if (text.includes('rain') || text.includes('showers')) return '🌧️';
+    if (text.includes('cloudy') || text.includes('overcast')) return '☁️';
+    if (text.includes('sunny') || text.includes('clear')) return '☀️';
+    if (text.includes('haze')) return '🌫️';
+    if (text.includes('wind')) return '💨';
+    
+    return '🌤️'; // Default
+}
+
+/**
+ * Setup weather forecast button
+ */
+function setupWeatherForecast() {
+    const loadBtn = document.getElementById('load-weather');
+    if (loadBtn) {
+        loadBtn.addEventListener('click', () => {
+            fetchNEAWeatherForecast();
+        });
+    }
+}
+
+// ===========================
+// NOTIFICATIONS
+// ===========================
+
 function showNotification(message, type = 'info') {
     // Create notification element
     const notification = document.createElement('div');
@@ -328,6 +458,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupNavigation();
     setupCTAButton();
     setupInviteCrew();
+    setupWeatherForecast();
     setupMobileMenu();
     setupGeolocation();
     observeElements();
