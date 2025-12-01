@@ -126,20 +126,49 @@
                         <span class="stat-label">♻️ Kg Removed</span>
                     </div>
                 </div>
-                <div style="margin-top: 20px; padding: 15px; background: #f0f7ff; border-radius: 8px;">
-                    <h3 style="margin-top: 0;">📊 Impact Tracker</h3>
-                    <div id="impact-tracker" style="margin-top: 10px;">
-                        <div style="margin: 10px 0; padding: 10px; background: white; border-radius: 5px; border-left: 4px solid #2ecc71;">
-                            <strong>🏖️ East Coast Park</strong> - 10kg removed (Updated today) ✅
+                
+                <!-- Expandable Details Section -->
+                <div class="crew-details-section">
+                    <!-- Squad Members Toggle -->
+                    <div class="detail-toggle">
+                        <button class="toggle-btn" id="toggle-members" aria-expanded="false">
+                            <span class="toggle-icon">▶</span>
+                            <span class="toggle-title">👥 Squad Members</span>
+                        </button>
+                        <div class="detail-content" id="members-content" style="display: none;">
+                            <div id="squad-members-list" class="members-list">
+                                <!-- Dynamically populated -->
+                            </div>
                         </div>
-                        <div style="margin: 10px 0; padding: 10px; background: white; border-radius: 5px; border-left: 4px solid #2ecc71;">
-                            <strong>🏝️ Sentosa Beach</strong> - 15kg removed (Last week) ✅
+                    </div>
+                    
+                    <!-- Cleanups Toggle -->
+                    <div class="detail-toggle">
+                        <button class="toggle-btn" id="toggle-cleanups" aria-expanded="false">
+                            <span class="toggle-icon">▶</span>
+                            <span class="toggle-title">📅 Cleanups Planned</span>
+                        </button>
+                        <div class="detail-content" id="cleanups-content" style="display: none;">
+                            <div id="cleanups-list" class="cleanups-list">
+                                <!-- Dynamically populated -->
+                            </div>
                         </div>
-                        <div style="margin: 10px 0; padding: 10px; background: white; border-radius: 5px; border-left: 4px solid #2ecc71;">
-                            <strong>🏄‍♂️ Pasir Ris</strong> - 20kg removed (This month) ✅
+                    </div>
+                    
+                    <!-- Impact Details Toggle -->
+                    <div class="detail-toggle">
+                        <button class="toggle-btn" id="toggle-impact" aria-expanded="false">
+                            <span class="toggle-icon">▶</span>
+                            <span class="toggle-title">🏆 Impact Tracker</span>
+                        </button>
+                        <div class="detail-content" id="impact-content" style="display: none;">
+                            <div id="impact-tracker-details" class="impact-tracker-details">
+                                <!-- Dynamically populated -->
+                            </div>
                         </div>
                     </div>
                 </div>
+                
                 <button class="btn btn-primary" id="invite-crew" style="margin-top: 15px;">👥 Invite Crew Member</button>
             </div>
         </div>

@@ -175,6 +175,11 @@ const appState = {
         document.getElementById('crew-count').textContent = this.crew.length;
         document.getElementById('cleanups-count').textContent = this.cleanups.length;
         document.getElementById('impact-count').textContent = Math.round(this.totalImpact);
+        
+        // Update expandable sections
+        updateSquadMembersList();
+        updateCleanupsList();
+        updateImpactTrackerDetails();
     }
 };
 
@@ -977,3 +982,157 @@ chatModal.addEventListener('click', (e) => {
 });
 
 console.log('✅ Chat widget initialized and ready!');
+
+// ===========================
+// EXPANDABLE CREW DETAILS
+// ===========================
+
+// Squad Members List
+function updateSquadMembersList() {
+    const membersList = document.getElementById('squad-members-list');
+    membersList.innerHTML = '';
+    
+    const avatars = ['👨‍💼', '👩‍💼', '👨‍🔧', '👩‍🌾', '👨‍⚕️', '👩‍💻', '👨‍🎨', '👩‍🍳'];
+    
+    appState.crew.forEach((member, index) => {
+        const memberCard = document.createElement('div');
+        memberCard.className = 'member-card';
+        memberCard.innerHTML = `
+            <div class="member-avatar">${avatars[index % avatars.length]}</div>
+            <div class="member-name">${member.name}</div>
+            <div class="member-role">${member.role}</div>
+            <div style="font-size: 0.85rem; color: #999; margin-top: 0.75rem;">Joined ShoreSquad</div>
+        `;
+        membersList.appendChild(memberCard);
+    });
+    
+    if (appState.crew.length === 0) {
+        membersList.innerHTML = '<p style="color: #999; grid-column: 1/-1; text-align: center; padding: 1rem;">No crew members yet. Invite your friends to get started! 👥</p>';
+    }
+}
+
+// Cleanups List
+function updateCleanupsList() {
+    const cleanupsList = document.getElementById('cleanups-list');
+    cleanupsList.innerHTML = '';
+    
+    const beachEmojis = {
+        'East Coast Park': '🏖️',
+        'Sentosa Beach': '🏝️',
+        'Pasir Ris Park': '🏄‍♂️',
+        'Changi Beach': '🌊'
+    };
+    
+    appState.cleanups.forEach((cleanup) => {
+        const cleanupCard = document.createElement('div');
+        cleanupCard.className = 'cleanup-card';
+        
+        const cleanupDate = new Date(cleanup.date);
+        const dateStr = cleanupDate.toLocaleDateString('en-SG', { 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric' 
+        });
+        
+        const emoji = beachEmojis[cleanup.location] || '🌊';
+        
+        cleanupCard.innerHTML = `
+            <div class="cleanup-location">${emoji} ${cleanup.location}</div>
+            <div class="cleanup-info">
+                <div class="cleanup-info-item">
+                    <span class="cleanup-info-icon">📅</span>
+                    <span>${dateStr}</span>
+                </div>
+                <div class="cleanup-info-item">
+                    <span class="cleanup-info-icon">♻️</span>
+                    <span><strong>${cleanup.kg}kg</strong> to remove</span>
+                </div>
+                <div class="cleanup-info-item">
+                    <span class="cleanup-info-icon">👥</span>
+                    <span><strong>${cleanup.members}</strong> team members</span>
+                </div>
+            </div>
+        `;
+        cleanupsList.appendChild(cleanupCard);
+    });
+    
+    if (appState.cleanups.length === 0) {
+        cleanupsList.innerHTML = '<p style="color: #999; grid-column: 1/-1; text-align: center; padding: 1rem;">No cleanups planned yet. Schedule your first cleanup! 📅</p>';
+    }
+}
+
+// Impact Tracker Details
+function updateImpactTrackerDetails() {
+    const impactDetails = document.getElementById('impact-tracker-details');
+    impactDetails.innerHTML = '';
+    
+    const beachEmojis = {
+        'East Coast Park': '🏖️',
+        'Sentosa Beach': '🏝️',
+        'Pasir Ris Park': '🏄‍♂️',
+        'Changi Beach': '🌊'
+    };
+    
+    appState.cleanups.forEach((cleanup) => {
+        const impactCard = document.createElement('div');
+        impactCard.className = 'impact-card';
+        
+        const cleanupDate = new Date(cleanup.date);
+        const dateStr = cleanupDate.toLocaleDateString('en-SG', { 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric' 
+        });
+        
+        const emoji = beachEmojis[cleanup.location] || '🌊';
+        
+        impactCard.innerHTML = `
+            <div class="impact-location">${emoji} ${cleanup.location}</div>
+            <div class="impact-kg">${cleanup.kg}<span class="impact-unit">kg</span></div>
+            <div class="impact-date">📅 ${dateStr}</div>
+            <div class="impact-status">✅ Completed with ${cleanup.members} team members</div>
+        `;
+        impactDetails.appendChild(impactCard);
+    });
+    
+    if (appState.cleanups.length === 0) {
+        impactDetails.innerHTML = '<p style="color: #999; grid-column: 1/-1; text-align: center; padding: 1rem;">No impact tracked yet. Plan your first cleanup to start making a difference! 🌍</p>';
+    }
+}
+
+// Toggle Expandable Sections
+function setupCrewDetailsToggle() {
+    const toggleButtons = [
+        { btn: document.getElementById('toggle-members'), content: document.getElementById('members-content') },
+        { btn: document.getElementById('toggle-cleanups'), content: document.getElementById('cleanups-content') },
+        { btn: document.getElementById('toggle-impact'), content: document.getElementById('impact-content') }
+    ];
+    
+    toggleButtons.forEach(({ btn, content }) => {
+        btn.addEventListener('click', () => {
+            const isExpanded = btn.getAttribute('aria-expanded') === 'true';
+            
+            if (isExpanded) {
+                // Collapse
+                content.style.display = 'none';
+                btn.setAttribute('aria-expanded', 'false');
+            } else {
+                // Expand
+                content.style.display = 'block';
+                btn.setAttribute('aria-expanded', 'true');
+                // Small delay to ensure smooth animation
+                setTimeout(() => {
+                    content.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 100);
+            }
+        });
+    });
+}
+
+// Initialize expandable sections when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    setupCrewDetailsToggle();
+    updateSquadMembersList();
+    updateCleanupsList();
+    updateImpactTrackerDetails();
+});
