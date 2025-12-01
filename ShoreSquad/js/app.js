@@ -820,5 +820,160 @@ document.addEventListener('keydown', (e) => {
             navMenu.classList.remove('active');
             document.querySelector('.menu-toggle').textContent = '☰';
         }
+        
+        // Close chat modal on Escape
+        const chatModal = document.getElementById('chat-modal');
+        if (chatModal && chatModal.classList.contains('active')) {
+            closeChatWidget();
+        }
     }
 });
+
+// ===========================
+// CUSTOM CHAT WIDGET FUNCTIONALITY
+// ===========================
+
+const chatModal = document.getElementById('chat-modal');
+const openChatBtn = document.getElementById('open-chat-widget');
+const closeChatBtn = document.getElementById('close-chat-widget');
+const chatInput = document.getElementById('chat-input');
+const sendChatBtn = document.getElementById('send-chat-btn');
+const chatMessagesContainer = document.getElementById('chat-messages');
+
+// Auto-responses library for fun, helpful interactions
+const chatResponses = {
+    weather: [
+        '🌤️ The weather API pulls real-time data from Singapore NEA! Check the "Weather Vibes" section to see what the beaches are expecting. Temperature, rain forecast, and wind speeds - all there!',
+        '🌊 Perfect beach weather depends on rain and wind! Our 4-day forecast helps you pick the best day for cleanup.'
+    ],
+    map: [
+        '🗺️ Great question! We have 4 awesome beaches: Pasir Ris Park, Sentosa Beach, East Coast Park, and Changi. Use the beach selector to see each location on Google Maps!',
+        '📍 The interactive map shows you exactly where to meet for cleanups. Pick a beach and zoom in to see the precise location!'
+    ],
+    cleanup: [
+        '📅 Planning a cleanup is easy! Pick a date, grab your crew, choose a beach, and let\'s make a difference! Every bit helps our beautiful coastline.',
+        '👥 Beach cleanups are more fun with friends! Invite your crew, set a time, and ShoreSquad will help you track your impact in kg removed. You\'ve got this! 💪'
+    ],
+    impact: [
+        '📊 Our impact tracker shows exactly how much trash you and your crew have removed. Currently 45kg from 3 successful cleanups! That\'s amazing for the environment! 🌍',
+        '💚 Every kg of trash removed is a victory for marine life. We celebrate your environmental wins here!'
+    ],
+    slang: [
+        '🇸🇬 Lah! This is Singapore, lor! Our app is super straightforward - no need to komplain, sia! Just tap around and you\'ll figure it out quickly, man.',
+        '😄 You\'re speaking our language! Singapore slang makes everything more fun. Let\'s do this cleanup together, lah!'
+    ],
+    default: [
+        '🌊 Thanks for your message! I\'m here to help with questions about weather, maps, cleanups, our impact, or just chatting in Singlish. What can I help you with?',
+        '👋 Great question! Feel free to ask me anything about ShoreSquad - I\'m here 24/7 to help you plan amazing beach cleanups!',
+        '💬 Awesome! We love your enthusiasm. Let me know if you need any guidance on getting started with your first cleanup.'
+    ]
+};
+
+function detectChatIntent(message) {
+    const lowerMsg = message.toLowerCase();
+    
+    if (lowerMsg.includes('weather') || lowerMsg.includes('forecast') || lowerMsg.includes('rain') || lowerMsg.includes('temperature')) {
+        return 'weather';
+    }
+    if (lowerMsg.includes('map') || lowerMsg.includes('beach') || lowerMsg.includes('location') || lowerMsg.includes('where')) {
+        return 'map';
+    }
+    if (lowerMsg.includes('cleanup') || lowerMsg.includes('clean') || lowerMsg.includes('trash') || lowerMsg.includes('plan')) {
+        return 'cleanup';
+    }
+    if (lowerMsg.includes('impact') || lowerMsg.includes('kg') || lowerMsg.includes('removed') || lowerMsg.includes('track')) {
+        return 'impact';
+    }
+    if (lowerMsg.includes('lah') || lowerMsg.includes('lor') || lowerMsg.includes('sia') || lowerMsg.includes('singlish')) {
+        return 'slang';
+    }
+    return 'default';
+}
+
+function getRandomResponse(category) {
+    const responses = chatResponses[category] || chatResponses.default;
+    return responses[Math.floor(Math.random() * responses.length)];
+}
+
+function openChatWidget() {
+    chatModal.classList.add('active');
+    chatInput.focus();
+}
+
+function closeChatWidget() {
+    chatModal.classList.remove('active');
+}
+
+function addMessageToChat(message, isUser = false) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `chat-message ${isUser ? 'user-message' : 'bot-message'}`;
+    
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'message-content';
+    contentDiv.innerHTML = `<p>${message}</p>`;
+    
+    const timeSpan = document.createElement('span');
+    timeSpan.className = 'message-time';
+    
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('en-SG', { hour: '2-digit', minute: '2-digit' });
+    timeSpan.textContent = timeStr;
+    
+    messageDiv.appendChild(contentDiv);
+    messageDiv.appendChild(timeSpan);
+    
+    chatMessagesContainer.appendChild(messageDiv);
+    
+    // Auto-scroll to bottom
+    setTimeout(() => {
+        chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+    }, 0);
+}
+
+function sendChatMessage() {
+    const message = chatInput.value.trim();
+    
+    if (!message) return;
+    
+    // Add user message to chat
+    addMessageToChat(message, true);
+    
+    // Clear input
+    chatInput.value = '';
+    chatInput.focus();
+    
+    // Disable send button temporarily
+    sendChatBtn.disabled = true;
+    
+    // Simulate bot typing and response
+    setTimeout(() => {
+        const intent = detectChatIntent(message);
+        const response = getRandomResponse(intent);
+        addMessageToChat(response, false);
+        sendChatBtn.disabled = false;
+    }, 800);
+}
+
+// Event Listeners for Chat Widget
+openChatBtn.addEventListener('click', openChatWidget);
+closeChatBtn.addEventListener('click', closeChatWidget);
+sendChatBtn.addEventListener('click', sendChatMessage);
+
+// Send message on Enter key
+chatInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        if (!sendChatBtn.disabled) {
+            sendChatMessage();
+        }
+    }
+});
+
+// Close modal when clicking outside
+chatModal.addEventListener('click', (e) => {
+    if (e.target === chatModal) {
+        closeChatWidget();
+    }
+});
+
+console.log('✅ Chat widget initialized and ready!');

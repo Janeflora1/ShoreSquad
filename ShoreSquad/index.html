@@ -169,6 +169,51 @@
                     <strong>⏰ Available 24/7</strong><br>
                     <em>Response time typically under 1 hour</em>
                 </p>
+                
+                <!-- Custom Chat Widget Button -->
+                <button id="open-chat-widget" class="btn btn-chat-widget">
+                    💬 Start Chat with Squad
+                </button>
+            </div>
+            
+            <!-- Custom Chat Modal -->
+            <div id="chat-modal" class="chat-modal">
+                <div class="chat-modal-content">
+                    <!-- Chat Header -->
+                    <div class="chat-header">
+                        <div class="chat-title-bar">
+                            <h4>🌊 ShoreSquad Support</h4>
+                            <p class="chat-status">Online - We're here to help! 👋</p>
+                        </div>
+                        <button id="close-chat-widget" class="chat-close-btn" aria-label="Close chat">✕</button>
+                    </div>
+                    
+                    <!-- Chat Messages Area -->
+                    <div id="chat-messages" class="chat-messages">
+                        <div class="chat-message bot-message">
+                            <div class="message-content">
+                                <p>🌊 Welcome to ShoreSquad Support! 👋</p>
+                                <p>Hi there! We're here to help with questions about weather, maps, cleanup planning, or anything beach-related.</p>
+                                <p><strong>How can we help you today?</strong></p>
+                            </div>
+                            <span class="message-time">Just now</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Chat Input Area -->
+                    <div class="chat-input-area">
+                        <input 
+                            type="text" 
+                            id="chat-input" 
+                            class="chat-input" 
+                            placeholder="Type your message... (e.g., 'Help with weather' or 'Plan a cleanup')"
+                            aria-label="Type message"
+                        >
+                        <button id="send-chat-btn" class="chat-send-btn" aria-label="Send message">
+                            ✈️ Send
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
