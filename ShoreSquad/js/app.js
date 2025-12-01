@@ -997,10 +997,12 @@ function updateSquadMembersList() {
     appState.crew.forEach((member, index) => {
         const memberCard = document.createElement('div');
         memberCard.className = 'member-card';
+        const memberRole = member.role || 'Member';
+        const memberName = member.name || 'Team Member';
         memberCard.innerHTML = `
             <div class="member-avatar">${avatars[index % avatars.length]}</div>
-            <div class="member-name">${member.name}</div>
-            <div class="member-role">${member.role}</div>
+            <div class="member-name">${memberName}</div>
+            <div class="member-role">${memberRole}</div>
             <div style="font-size: 0.85rem; color: #999; margin-top: 0.75rem;">Joined ShoreSquad</div>
         `;
         membersList.appendChild(memberCard);
@@ -1034,10 +1036,13 @@ function updateCleanupsList() {
             day: 'numeric' 
         });
         
-        const emoji = beachEmojis[cleanup.location] || '🌊';
+        const location = cleanup.location || 'Unknown Beach';
+        const kg = cleanup.kg || 0;
+        const members = cleanup.members || 0;
+        const emoji = beachEmojis[location] || '🌊';
         
         cleanupCard.innerHTML = `
-            <div class="cleanup-location">${emoji} ${cleanup.location}</div>
+            <div class="cleanup-location">${emoji} ${location}</div>
             <div class="cleanup-info">
                 <div class="cleanup-info-item">
                     <span class="cleanup-info-icon">📅</span>
@@ -1045,11 +1050,11 @@ function updateCleanupsList() {
                 </div>
                 <div class="cleanup-info-item">
                     <span class="cleanup-info-icon">♻️</span>
-                    <span><strong>${cleanup.kg}kg</strong> to remove</span>
+                    <span><strong>${kg}kg</strong> to remove</span>
                 </div>
                 <div class="cleanup-info-item">
                     <span class="cleanup-info-icon">👥</span>
-                    <span><strong>${cleanup.members}</strong> team members</span>
+                    <span><strong>${members}</strong> team members</span>
                 </div>
             </div>
         `;
@@ -1276,7 +1281,8 @@ function updateImpactTrackerDetails() {
             };
         }
         
-        monthlyData[monthYear].kg += cleanup.kg;
+        const kg = cleanup.kg || 0;
+        monthlyData[monthYear].kg += kg;
         monthlyData[monthYear].cleanups += 1;
     });
     
@@ -1299,10 +1305,11 @@ function updateImpactTrackerDetails() {
         impactCard.className = 'monthly-impact-card';
         
         const monthName = monthNames[data.month];
+        const kgValue = data.kg || 0;
         
         impactCard.innerHTML = `
             <div class="month-year-header">${monthName} ${data.year}</div>
-            <div class="month-kg">${data.kg.toFixed(1)}<span class="month-kg-unit">kg</span></div>
+            <div class="month-kg">${kgValue.toFixed(1)}<span class="month-kg-unit">kg</span></div>
             <div class="month-cleanups">📅 ${data.cleanups} cleanup${data.cleanups !== 1 ? 's' : ''}</div>
         `;
         monthlyGrid.appendChild(impactCard);
