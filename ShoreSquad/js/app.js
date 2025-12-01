@@ -88,9 +88,19 @@ function observeElements() {
  * across browser sessions
  */
 const appState = {
-    crew: [],
-    cleanups: [],
-    totalImpact: 0,
+    crew: [
+        { name: 'Alex Chen', role: 'Crew Leader', email: 'alex@shoresquad.sg' },
+        { name: 'Priya Sharma', role: 'Coordinator', email: 'priya@shoresquad.sg' },
+        { name: 'Marcus Lee', role: 'Member', email: 'marcus@shoresquad.sg' },
+        { name: 'Zara Mohamed', role: 'Member', email: 'zara@shoresquad.sg' },
+        { name: 'Ethan Ng', role: 'Member', email: 'ethan@shoresquad.sg' }
+    ],
+    cleanups: [
+        { location: 'East Coast Park', date: '2025-11-28', kg: 10, members: 3 },
+        { location: 'Sentosa Beach', date: '2025-11-21', kg: 15, members: 4 },
+        { location: 'Pasir Ris Park', date: '2025-11-14', kg: 20, members: 5 }
+    ],
+    totalImpact: 45,
     userLocation: null,
     weatherData: {},
 
