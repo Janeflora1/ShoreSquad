@@ -1,6 +1,31 @@
 /**
  * ShoreSquad - Main Application JavaScript
- * Features: Interactivity, Performance Optimization, and Progressive Enhancement
+ * 
+ * Features:
+ * - Responsive state management with localStorage
+ * - Real-time weather API integration (NEA data.gov.sg)
+ * - Error handling with user-friendly feedback
+ * - Loading states and spinners
+ * - Mobile-responsive design with hamburger menu
+ * - Accessibility support (keyboard navigation, ARIA labels)
+ * - Performance optimization (debounce, throttle)
+ * 
+ * Architecture:
+ * 1. Performance Utilities - debounce, throttle, lazy loading
+ * 2. State Management - appState object with localStorage sync
+ * 3. DOM Interactions - Event handlers for UI elements
+ * 4. Weather Integration - NEA API with error handling
+ * 5. Notifications - Toast system with 4 notification types
+ * 6. Animations - CSS animations injected dynamically
+ * 7. Mobile Support - Hamburger menu and geolocation
+ * 8. App Init - DOMContentLoaded setup
+ * 
+ * Error Handling:
+ * - Try-catch blocks around all async operations
+ * - Graceful fallbacks for missing data
+ * - User-friendly error messages via showNotification()
+ * - Loading states to prevent double-clicks
+ * - Network error recovery
  */
 
 // ===========================
@@ -49,6 +74,19 @@ function observeElements() {
 // STATE MANAGEMENT
 // ===========================
 
+/**
+ * appState - Central state object for the application
+ * 
+ * Structure:
+ * - crew: Array of crew member objects
+ * - cleanups: Array of scheduled cleanup events
+ * - totalImpact: Cumulative kilograms of waste removed
+ * - userLocation: User's geolocation coordinates
+ * - weatherData: Latest weather API response
+ * 
+ * All data automatically syncs with localStorage for persistence
+ * across browser sessions
+ */
 const appState = {
     crew: [],
     cleanups: [],
@@ -56,13 +94,20 @@ const appState = {
     userLocation: null,
     weatherData: {},
 
-    // Initialize app
+    /**
+     * Initialize app on page load
+     * - Restores data from localStorage
+     * - Updates UI elements with current state
+     */
     init() {
         this.loadFromLocalStorage();
         this.updateUI();
     },
 
-    // Load data from localStorage
+    /**
+     * Load data from browser localStorage
+     * Gracefully handles missing or corrupted data
+     */
     loadFromLocalStorage() {
         const saved = localStorage.getItem('shoreSquadData');
         if (saved) {
