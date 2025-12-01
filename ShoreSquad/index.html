@@ -152,10 +152,23 @@
             <p>ShoreSquad mobilizes young people to clean beaches by combining weather tracking, interactive maps, and social features. We believe eco-action should be fun, connected, and impactful, lor!</p>
             <p><strong>🏄‍♂️ Our Mission:</strong> To make beach cleanups accessible, enjoyable, and community-driven—one squad at a time, sia! 🌊</p>
             <p><strong>💡 Why We Started:</strong> Singapore's beaches are amazing, but they need our help! Join the movement to keep them clean and beautiful for future generations. Together, we're making a difference! 🌍✨</p>
-            <div style="margin-top: 20px; padding: 15px; background: #f0f7ff; border-radius: 8px;">
-                <h3 style="margin-top: 0;">💬 Squad Chat Support</h3>
-                <p style="color: #666; margin: 10px 0;">Questions? Feedback? Got a beach cleanup idea? Chat with us using the Tawk.to widget below! Our team is here to help, lor! 👋</p>
-                <p style="color: #999; font-size: 12px; margin: 10px 0;">Available 24/7 for all your ShoreSquad questions—questions about weather, maps, or how to organize your first cleanup!</p>
+            
+            <!-- Squad Chat Support Section -->
+            <div class="squad-chat-support">
+                <div class="chat-icon">💬</div>
+                <h3>Squad Chat Support</h3>
+                <p class="chat-main">Questions? Feedback? Got a beach cleanup idea?</p>
+                <p class="chat-description">Chat with our team using the widget below! We're here to help you plan your first cleanup or answer any questions about ShoreSquad. Available 24/7! 👋</p>
+                <div class="chat-features">
+                    <span class="feature-tag">🌊 Weather Help</span>
+                    <span class="feature-tag">🗺️ Map Guidance</span>
+                    <span class="feature-tag">📅 Cleanup Planning</span>
+                    <span class="feature-tag">💚 Environmental Tips</span>
+                </div>
+                <p class="chat-availability">
+                    <strong>⏰ Available 24/7</strong><br>
+                    <em>Response time typically under 1 hour</em>
+                </p>
             </div>
         </div>
     </section>
@@ -170,22 +183,28 @@
     <script src="js/app.js"></script>
     
     <!-- Tawk.to Chat Widget for Squad Support -->
-    <!-- Customize propertyId with your Tawk.to account: https://tawk.to/ -->
+    <!-- This is the default demo account - customize with your own Tawk.to account -->
+    <!-- Sign up at: https://tawk.to/ -->
     <script type="text/javascript">
-        var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+        var Tawk_API = Tawk_API || {}, Tawk_LoadStart = new Date();
         (function(){
-            var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-            s1.async=true;
-            s1.src='https://embed.tawk.to/675cf5c5cebbb1e7ba0eb9ff/1iio4d4fl';
-            s1.charset='UTF-8';
-            s1.setAttribute('crossorigin','*');
-            s0.parentNode.insertBefore(s1,s0);
+            var s1 = document.createElement("script"), s0 = document.getElementsByTagName("script")[0];
+            s1.async = true;
+            s1.src = 'https://embed.tawk.to/675cf5c5cebbb1e7ba0eb9ff/1iio4d4fl';
+            s1.charset = 'UTF-8';
+            s1.setAttribute('crossorigin', '*');
+            s0.parentNode.insertBefore(s1, s0);
         })();
         
-        // Customize Tawk.to to feel like ShoreSquad
+        // Customize Tawk.to widget for ShoreSquad
         if (typeof Tawk_API !== 'undefined') {
             Tawk_API.onLoad = function() {
-                console.log('ShoreSquad Squad Chat ready! 💬');
+                console.log('🌊 ShoreSquad Squad Chat widget loaded successfully!');
+                // Optional: Customize widget appearance
+                Tawk_API.setAttributes({
+                    'name': 'ShoreSquad User',
+                    'email': 'user@shoresquad.sg'
+                }, function(error){});
             };
         }
     </script>
