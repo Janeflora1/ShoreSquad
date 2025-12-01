@@ -973,7 +973,11 @@ function updateSquadMembersList() {
     const membersList = document.getElementById('squad-members-list');
     membersList.innerHTML = '';
     
-    const avatars = ['👨‍💼', '👩‍💼', '👨‍🔧', '👩‍🌾', '👨‍⚕️', '👩‍💻', '👨‍🎨', '👩‍🍳'];
+    const genderIcons = {
+        'Male': '👨',
+        'Female': '👩',
+        'Other': '🧑'
+    };
     
     appState.crew.forEach((member, index) => {
         const memberCard = document.createElement('div');
@@ -981,10 +985,12 @@ function updateSquadMembersList() {
         memberCard.style.position = 'relative';
         const memberRole = member.role || 'Member';
         const memberName = member.name || 'Team Member';
+        const memberGender = member.gender || 'Other';
+        const genderIcon = genderIcons[memberGender] || '🧑';
         memberCard.innerHTML = `
             <button class="edit-member-btn" data-index="${index}" title="Edit member">✏️</button>
             <button class="delete-member-btn" data-index="${index}" title="Delete member">🗑️</button>
-            <div class="member-avatar">${avatars[index % avatars.length]}</div>
+            <div class="member-avatar">${genderIcon}</div>
             <div class="member-name">${memberName}</div>
             <div class="member-role">${memberRole}</div>
             <div style="font-size: 0.85rem; color: #999; margin-top: 0.75rem;">Joined ShoreSquad</div>
@@ -1258,8 +1264,9 @@ function setupMemberForm() {
         
         const name = document.getElementById('member-name').value.trim();
         const role = document.getElementById('member-role').value;
+        const gender = document.getElementById('member-gender').value;
         
-        if (!name || !role) {
+        if (!name || !role || !gender) {
             showNotification('Please fill in all fields', 'error');
             return;
         }
@@ -1271,11 +1278,12 @@ function setupMemberForm() {
             // Update existing member
             appState.crew[editIndex].name = name;
             appState.crew[editIndex].role = role;
+            appState.crew[editIndex].gender = gender;
             showNotification(`✅ ${name}'s profile updated!`, 'success');
             delete form.dataset.editIndex;
         } else {
             // Add new member
-            appState.addCrewMember(name, role);
+            appState.addCrewMember(name, role, gender);
             showNotification(`✅ ${name} added to your crew as ${role}!`, 'success');
         }
         
@@ -1293,6 +1301,7 @@ function editMember(index) {
     const member = appState.crew[index];
     document.getElementById('member-name').value = member.name || '';
     document.getElementById('member-role').value = member.role || '';
+    document.getElementById('member-gender').value = member.gender || '';
     
     const form = document.getElementById('member-form');
     form.dataset.editIndex = index;
@@ -1400,13 +1409,14 @@ function updateImpactTrackerDetails() {
     impactDetails.appendChild(monthlyGrid);
 }
 
-// Update appState.addCrewMember to accept role
+// Update appState.addCrewMember to accept role and gender
 const originalAddCrewMember = appState.addCrewMember.bind(appState);
-appState.addCrewMember = function(name, role) {
+appState.addCrewMember = function(name, role, gender) {
     const member = {
         id: Date.now(),
         name,
         role: role || 'Member',
+        gender: gender || 'Other',
         joinedAt: new Date().toISOString()
     };
     this.crew.push(member);
