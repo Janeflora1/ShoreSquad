@@ -198,22 +198,48 @@ function setupInviteCrew() {
  * Fetch 4-day weather forecast from NEA API (data.gov.sg)
  */
 async function fetchNEAWeatherForecast() {
+    const resultsContainer = document.getElementById('weather-results');
+    const loadBtn = document.getElementById('load-weather');
+    
     try {
-        showNotification('Loading weather forecast...', 'info');
+        // Show loading state
+        resultsContainer.innerHTML = `
+            <div class="loading-container">
+                <span class="loading"></span>
+                <span class="loading-text">Loading weather forecast...</span>
+            </div>
+        `;
+        loadBtn.disabled = true;
+        loadBtn.style.opacity = '0.6';
         
         const apiUrl = 'https://api.data.gov.sg/v1/environment/4-day-weather-forecast';
         
         const response = await fetch(apiUrl);
         if (!response.ok) {
-            throw new Error('Failed to fetch weather data');
+            throw new Error(`API Error: ${response.status} ${response.statusText}`);
         }
         
         const weatherData = await response.json();
+        
+        if (!weatherData.items || weatherData.items.length === 0) {
+            throw new Error('No weather data available from API');
+        }
+        
         displayNEAWeatherForecast(weatherData);
-        showNotification('Weather forecast loaded!', 'success');
+        showNotification('Weather forecast loaded successfully!', 'success');
     } catch (error) {
         console.error('Weather fetch error:', error);
-        showNotification('Failed to load weather forecast', 'error');
+        resultsContainer.innerHTML = `
+            <div class="error">
+                <strong>⚠️ Error Loading Weather</strong><br>
+                ${error.message || 'Failed to fetch weather data. Please try again.'}
+            </div>
+        `;
+        showNotification(`Weather Error: ${error.message}`, 'error');
+    } finally {
+        // Restore button state
+        loadBtn.disabled = false;
+        loadBtn.style.opacity = '1';
     }
 }
 
@@ -223,69 +249,84 @@ async function fetchNEAWeatherForecast() {
 function displayNEAWeatherForecast(data) {
     const resultsContainer = document.getElementById('weather-results');
     
-    if (!data.items || data.items.length === 0) {
-        resultsContainer.innerHTML = '<p class="error">No weather data available</p>';
-        return;
-    }
-    
-    const forecastItem = data.items[0];
-    const forecasts = forecastItem.forecasts || [];
-    
-    let html = `
-        <div class="weather-info">
-            <p class="weather-updated">Last updated: ${new Date(forecastItem.update_timestamp).toLocaleString('en-SG')}</p>
-            <div class="forecast-grid">
-    `;
-    
-    forecasts.forEach((day, index) => {
-        const dateObj = new Date(day.timestamp);
-        const dayName = dateObj.toLocaleDateString('en-SG', { weekday: 'short', month: 'short', day: 'numeric' });
+    try {
+        if (!data.items || data.items.length === 0) {
+            resultsContainer.innerHTML = '<div class="error">No weather data available</div>';
+            return;
+        }
         
-        // Extract temperature values (handle both high/low or single values)
-        const tempHigh = day.temperature?.high || 'N/A';
-        const tempLow = day.temperature?.low || 'N/A';
+        const forecastItem = data.items[0];
+        const forecasts = forecastItem.forecasts || [];
         
-        // Extract humidity values
-        const humidityHigh = day.relative_humidity?.high || 'N/A';
-        const humidityLow = day.relative_humidity?.low || 'N/A';
+        if (forecasts.length === 0) {
+            resultsContainer.innerHTML = '<div class="error">No forecast data available</div>';
+            return;
+        }
         
-        // Extract wind data
-        const windHigh = day.wind?.speed?.high || 'N/A';
-        const windLow = day.wind?.speed?.low || 'N/A';
-        const windDir = day.wind?.direction || 'N/A';
+        let html = `
+            <div class="weather-info">
+                <p class="weather-updated">Last updated: ${new Date(forecastItem.update_timestamp).toLocaleString('en-SG')}</p>
+                <div class="forecast-grid">
+        `;
         
-        // Get emoji based on forecast text
-        const weatherEmoji = getWeatherEmoji(day.forecast);
+        forecasts.forEach((day, index) => {
+            try {
+                const dateObj = new Date(day.timestamp);
+                const dayName = dateObj.toLocaleDateString('en-SG', { weekday: 'short', month: 'short', day: 'numeric' });
+                
+                // Extract temperature values with fallback
+                const tempHigh = day.temperature?.high ?? day.temperature_2m_max ?? 'N/A';
+                const tempLow = day.temperature?.low ?? day.temperature_2m_min ?? 'N/A';
+                
+                // Extract humidity values
+                const humidityHigh = day.relative_humidity?.high ?? 'N/A';
+                const humidityLow = day.relative_humidity?.low ?? 'N/A';
+                
+                // Extract wind data
+                const windHigh = day.wind?.speed?.high ?? 'N/A';
+                const windLow = day.wind?.speed?.low ?? 'N/A';
+                const windDir = day.wind?.direction ?? 'N/A';
+                
+                // Get emoji based on forecast text
+                const weatherEmoji = getWeatherEmoji(day.forecast || '');
+                
+                html += `
+                    <div class="forecast-day">
+                        <div class="forecast-date">${dayName}</div>
+                        <div class="forecast-icon">${weatherEmoji}</div>
+                        <div class="forecast-condition">${day.forecast || 'Unknown'}</div>
+                        <div class="forecast-details">
+                            <div class="detail-item">
+                                <span class="detail-label">🌡️ Temp:</span>
+                                <span class="detail-value">${tempHigh}°C - ${tempLow}°C</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">💧 Humidity:</span>
+                                <span class="detail-value">${humidityHigh}% - ${humidityLow}%</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">💨 Wind:</span>
+                                <span class="detail-value">${windLow}-${windHigh} km/h ${windDir}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } catch (dayError) {
+                console.error(`Error processing forecast day ${index}:`, dayError);
+                html += `<div class="forecast-day error-day"><p>Error loading day ${index + 1}</p></div>`;
+            }
+        });
         
         html += `
-            <div class="forecast-day">
-                <div class="forecast-date">${dayName}</div>
-                <div class="forecast-icon">${weatherEmoji}</div>
-                <div class="forecast-condition">${day.forecast}</div>
-                <div class="forecast-details">
-                    <div class="detail-item">
-                        <span class="detail-label">🌡️ Temp:</span>
-                        <span class="detail-value">${tempHigh}°C - ${tempLow}°C</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">💧 Humidity:</span>
-                        <span class="detail-value">${humidityHigh}% - ${humidityLow}%</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">💨 Wind:</span>
-                        <span class="detail-value">${windLow}-${windHigh} km/h ${windDir}</span>
-                    </div>
                 </div>
             </div>
         `;
-    });
-    
-    html += `
-            </div>
-        </div>
-    `;
-    
-    resultsContainer.innerHTML = html;
+        
+        resultsContainer.innerHTML = html;
+    } catch (error) {
+        console.error('Display weather error:', error);
+        resultsContainer.innerHTML = `<div class="error">Error displaying weather data: ${error.message}</div>`;
+    }
 }
 
 /**
@@ -321,30 +362,60 @@ function setupWeatherForecast() {
 // ===========================
 
 function showNotification(message, type = 'info') {
-    // Create notification element
-    const notification = document.createElement('div');
-    notification.className = `notification notification-${type}`;
-    notification.textContent = message;
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 1rem 1.5rem;
-        background-color: ${getNotificationColor(type)};
-        color: white;
-        border-radius: 8px;
-        z-index: 1000;
-        animation: slideIn 0.3s ease;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    `;
+    try {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.textContent = message;
+        
+        // Apply CSS classes for styling
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            animation: slideIn 0.3s ease;
+            max-width: 400px;
+            word-wrap: break-word;
+        `;
 
-    document.body.appendChild(notification);
+        document.body.appendChild(notification);
 
-    // Remove after 4 seconds
-    setTimeout(() => {
-        notification.style.animation = 'slideOut 0.3s ease';
-        setTimeout(() => notification.remove(), 300);
-    }, 4000);
+        // Auto-remove after 4 seconds
+        const timeoutId = setTimeout(() => {
+            try {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 300);
+            } catch (e) {
+                console.error('Error removing notification:', e);
+            }
+        }, 4000);
+
+        // Allow manual dismiss
+        notification.style.cursor = 'pointer';
+        notification.addEventListener('click', () => {
+            clearTimeout(timeoutId);
+            try {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 300);
+            } catch (e) {
+                console.error('Error removing notification:', e);
+            }
+        });
+    } catch (error) {
+        console.error('Error showing notification:', error);
+    }
 }
 
 function getNotificationColor(type) {
@@ -393,6 +464,12 @@ function addAnimations() {
             }
             to {
                 opacity: 1;
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
             }
         }
     `;

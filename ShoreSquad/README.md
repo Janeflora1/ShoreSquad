@@ -87,6 +87,15 @@ ShoreSquad is a web application designed to mobilize young people to clean beach
 - ✅ Optimized images (future)
 - ✅ Lazy loading support
 
+### 5. **Robustness & Error Handling**
+- ✅ Try-catch blocks for API calls
+- ✅ Loading spinners during data fetch
+- ✅ User-friendly error messages
+- ✅ Graceful fallbacks for missing data
+- ✅ Network error recovery
+- ✅ Invalid data validation
+- ✅ Toast notifications for user feedback
+
 ---
 
 ## 📁 Project Structure
@@ -110,28 +119,149 @@ ShoreSquad/
 ### Prerequisites
 - Modern web browser (Chrome, Firefox, Safari, Edge)
 - Node.js 14+ (for Live Server)
+- Git (optional, for version control)
 
-### Installation
+### Installation & Running the App
 
-1. **Clone or download the project:**
-   ```bash
-   cd ShoreSquad
-   ```
+#### Option 1: Using Live Server (Recommended)
 
-2. **Install dependencies:**
+1. **Install dependencies:**
    ```bash
    npm install
    ```
 
-3. **Start development server:**
+2. **Start development server:**
    ```bash
    npm start
    ```
-   This launches Live Server at `http://localhost:8080`
+   - Live Server opens at `http://localhost:5500` automatically
+   - File changes auto-refresh the browser
+   - Perfect for development
 
-4. **Alternative: Quick start without npm:**
-   - Simply open `index.html` in your browser
-   - Or use any local server (Python, PHP, etc.)
+3. **Or use a specific port:**
+   ```bash
+   npm run dev
+   ```
+
+#### Option 2: Direct Browser Open
+Simply double-click `index.html` to open in your browser
+- Works offline for basic functionality
+- No server required
+- Some features may have limitations
+
+#### Option 3: Python Simple Server
+```bash
+# Python 3
+python -m http.server 8000
+
+# Then visit: http://localhost:8000
+```
+
+#### Option 4: Node.js http-server
+```bash
+npm install -g http-server
+http-server
+
+# Then visit: http://localhost:8080
+```
+
+---
+
+## 📖 Usage Guide
+
+### 🗺️ Map & Location
+1. Navigate to the **Map** section via the navbar
+2. View the embedded Google Maps showing **Pasir Ris** (next cleanup location)
+3. Coordinates: 1.381497, 103.955574
+
+### ⛅ Weather Forecast
+1. Click **"Load Weather Forecast"** button
+2. View Singapore's 4-day forecast with:
+   - Temperature range (°C)
+   - Humidity percentage
+   - Wind speed (km/h) and direction
+   - Weather conditions with emoji
+3. All data from official NEA API (data.gov.sg)
+
+### 👥 Crew Management
+1. Click **"Invite Crew Member"** in the My Crew section
+2. Enter crew member's name and email
+3. Stats update automatically:
+   - Crew count
+   - Cleanup events planned
+   - Total kg of waste removed
+
+### 🎯 Planning Cleanups
+1. Click **"Start a Cleanup"** button on hero section
+2. Enter beach location and cleanup date
+3. Events saved to browser's local storage
+4. Can be accessed anytime without backend
+
+### 📊 Impact Tracking
+- View collective crew statistics
+- Total members and cleanups planned
+- Cumulative kg removed (metric system)
+
+---
+
+## 🎨 Customization
+
+### Change Colors
+Edit CSS variables in `css/styles.css` (lines 2-22):
+```css
+:root {
+    --color-primary: #0066cc;      /* Change from blue */
+    --color-accent: #ff6b35;       /* Change from coral */
+    --color-success: #2ecc71;      /* Change from green */
+}
+```
+
+### Modify Map Location
+Edit the iframe in `index.html` (line 70):
+```html
+<iframe src="https://www.google.com/maps/embed?pb=..."></iframe>
+```
+
+### Update Weather API
+The app uses NEA's free API. No configuration needed!
+- Endpoint: `https://api.data.gov.sg/v1/environment/4-day-weather-forecast`
+- No authentication required
+- Real-time Singapore weather data
+
+---
+
+## 🛡️ Error Handling & Robustness
+
+### API Error Handling
+- **Network Failures**: Graceful error messages with retry instructions
+- **Invalid Data**: Fallback values (e.g., "N/A" for missing temp)
+- **API Downtime**: User-friendly notifications
+- **Loading States**: Visual spinner during fetch operations
+
+### User Feedback System
+1. **Success Messages**: Green toast notifications ✅
+2. **Error Messages**: Red toast with details ⚠️
+3. **Info Messages**: Blue notifications for loading 📘
+4. **Warning Messages**: Yellow alerts ⚡
+
+Example:
+```javascript
+showNotification('Weather forecast loaded!', 'success');
+showNotification('Failed to load weather', 'error');
+showNotification('Loading weather data...', 'info');
+```
+
+### Loading States
+- **Spinner Animation**: Rotating blue spinner during data fetch
+- **Button Disabled**: Prevents multiple requests
+- **Visual Feedback**: Opacity change during loading
+- **Auto-recovery**: Button re-enables after request completes
+
+### Validation
+- Checks for null/undefined values before rendering
+- Validates API response structure
+- Handles missing optional fields gracefully
+- Array bounds checking in loops
 
 ---
 
