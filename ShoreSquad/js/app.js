@@ -997,9 +997,12 @@ function updateSquadMembersList() {
     appState.crew.forEach((member, index) => {
         const memberCard = document.createElement('div');
         memberCard.className = 'member-card';
+        memberCard.style.position = 'relative';
         const memberRole = member.role || 'Member';
         const memberName = member.name || 'Team Member';
         memberCard.innerHTML = `
+            <button class="edit-member-btn" data-index="${index}" title="Edit member">✏️</button>
+            <button class="delete-member-btn" data-index="${index}" title="Delete member">🗑️</button>
             <div class="member-avatar">${avatars[index % avatars.length]}</div>
             <div class="member-name">${memberName}</div>
             <div class="member-role">${memberRole}</div>
@@ -1011,6 +1014,28 @@ function updateSquadMembersList() {
     if (appState.crew.length === 0) {
         membersList.innerHTML = '<p style="color: #999; grid-column: 1/-1; text-align: center; padding: 1rem;">No crew members yet. Invite your friends to get started! 👥</p>';
     }
+    
+    // Add event listeners for edit and delete
+    document.querySelectorAll('.edit-member-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const index = parseInt(btn.dataset.index);
+            editMember(index);
+        });
+    });
+    
+    document.querySelectorAll('.delete-member-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const index = parseInt(btn.dataset.index);
+            if (confirm('Remove this crew member?')) {
+                appState.crew.splice(index, 1);
+                appState.save();
+                appState.updateUI();
+                showNotification('❌ Crew member removed', 'info');
+            }
+        });
+    });
 }
 
 // Cleanups List
@@ -1025,9 +1050,10 @@ function updateCleanupsList() {
         'Changi Beach': '🌊'
     };
     
-    appState.cleanups.forEach((cleanup) => {
+    appState.cleanups.forEach((cleanup, index) => {
         const cleanupCard = document.createElement('div');
         cleanupCard.className = 'cleanup-card';
+        cleanupCard.style.position = 'relative';
         
         const cleanupDate = new Date(cleanup.date);
         const dateStr = cleanupDate.toLocaleDateString('en-SG', { 
@@ -1042,6 +1068,8 @@ function updateCleanupsList() {
         const emoji = beachEmojis[location] || '🌊';
         
         cleanupCard.innerHTML = `
+            <button class="edit-cleanup-btn" data-index="${index}" title="Edit cleanup">✏️</button>
+            <button class="delete-cleanup-btn" data-index="${index}" title="Delete cleanup">🗑️</button>
             <div class="cleanup-location">${emoji} ${location}</div>
             <div class="cleanup-info">
                 <div class="cleanup-info-item">
@@ -1050,7 +1078,7 @@ function updateCleanupsList() {
                 </div>
                 <div class="cleanup-info-item">
                     <span class="cleanup-info-icon">♻️</span>
-                    <span><strong>${kg}kg</strong> to remove</span>
+                    <span><strong>${kg}kg</strong> removed</span>
                 </div>
                 <div class="cleanup-info-item">
                     <span class="cleanup-info-icon">👥</span>
@@ -1064,6 +1092,30 @@ function updateCleanupsList() {
     if (appState.cleanups.length === 0) {
         cleanupsList.innerHTML = '<p style="color: #999; grid-column: 1/-1; text-align: center; padding: 1rem;">No cleanups planned yet. Schedule your first cleanup! 📅</p>';
     }
+    
+    // Add event listeners for edit and delete
+    document.querySelectorAll('.edit-cleanup-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const index = parseInt(btn.dataset.index);
+            editCleanup(index);
+        });
+    });
+    
+    document.querySelectorAll('.delete-cleanup-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const index = parseInt(btn.dataset.index);
+            if (confirm('Remove this cleanup?')) {
+                const removedKg = appState.cleanups[index].kg || 0;
+                appState.totalImpact -= removedKg;
+                appState.cleanups.splice(index, 1);
+                appState.save();
+                appState.updateUI();
+                showNotification('❌ Cleanup removed', 'info');
+            }
+        });
+    });
 }
 
 // Impact Tracker Details
@@ -1159,35 +1211,62 @@ function setupCleanupForm() {
         const beach = document.getElementById('beach-select').value;
         const date = document.getElementById('cleanup-date').value;
         const members = parseInt(document.getElementById('cleanup-members').value);
-        const kg = parseFloat(document.getElementById('cleanup-kg').value);
+        const kg = parseFloat(document.getElementById('cleanup-kg').value) || 0;
         
-        if (!beach || !date || !members || kg === null) {
-            showNotification('Please fill in all fields', 'error');
+        if (!beach || !date || !members) {
+            showNotification('Please fill in beach, date, and members', 'error');
             return;
         }
         
-        // Add cleanup to app state
-        appState.cleanups.push({
-            location: beach,
-            date: date,
-            kg: kg,
-            members: members
-        });
+        // Check if editing
+        const editIndex = form.dataset.editIndex;
         
-        // Update total impact
-        appState.totalImpact += kg;
+        if (editIndex !== undefined) {
+            // Update existing cleanup
+            const oldKg = appState.cleanups[editIndex].kg || 0;
+            appState.cleanups[editIndex] = {
+                location: beach,
+                date: date,
+                kg: kg,
+                members: members
+            };
+            appState.totalImpact = appState.totalImpact - oldKg + kg;
+            showNotification(`✅ Cleanup updated!`, 'success');
+            delete form.dataset.editIndex;
+        } else {
+            // Add new cleanup
+            appState.cleanups.push({
+                location: beach,
+                date: date,
+                kg: kg,
+                members: members
+            });
+            appState.totalImpact += kg;
+            showNotification(`✅ Cleanup logged at ${beach} with ${kg > 0 ? kg + 'kg' : 'no'} recorded!`, 'success');
+        }
+        
         appState.save();
-        
-        // Update UI
         appState.updateUI();
-        
-        // Show success
-        showNotification(`✅ Cleanup logged at ${beach} with ${kg}kg removed!`, 'success');
-        
-        // Reset form and close modal
         form.reset();
         closeModal('cleanup-modal');
+        
+        // Reset submit button text
+        submit.textContent = '✅ Log Cleanup';
     });
+}
+
+function editCleanup(index) {
+    const cleanup = appState.cleanups[index];
+    document.getElementById('beach-select').value = cleanup.location || '';
+    document.getElementById('cleanup-date').value = cleanup.date || '';
+    document.getElementById('cleanup-members').value = cleanup.members || '';
+    document.getElementById('cleanup-kg').value = cleanup.kg || '';
+    
+    const form = document.getElementById('cleanup-form');
+    form.dataset.editIndex = index;
+    form.querySelector('button[type="submit"]').textContent = '✅ Update Cleanup';
+    
+    openModal('cleanup-modal');
 }
 
 function setupMemberForm() {
@@ -1204,19 +1283,41 @@ function setupMemberForm() {
             return;
         }
         
-        // Add member to app state
-        appState.addCrewMember(name, role);
+        // Check if editing
+        const editIndex = form.dataset.editIndex;
         
-        // Update UI
+        if (editIndex !== undefined) {
+            // Update existing member
+            appState.crew[editIndex].name = name;
+            appState.crew[editIndex].role = role;
+            showNotification(`✅ ${name}'s profile updated!`, 'success');
+            delete form.dataset.editIndex;
+        } else {
+            // Add new member
+            appState.addCrewMember(name, role);
+            showNotification(`✅ ${name} added to your crew as ${role}!`, 'success');
+        }
+        
+        appState.save();
         appState.updateUI();
-        
-        // Show success
-        showNotification(`✅ ${name} added to your crew as ${role}!`, 'success');
-        
-        // Reset form and close modal
         form.reset();
         closeModal('member-modal');
+        
+        // Reset submit button text
+        form.querySelector('button[type="submit"]').textContent = '✅ Add Member';
     });
+}
+
+function editMember(index) {
+    const member = appState.crew[index];
+    document.getElementById('member-name').value = member.name || '';
+    document.getElementById('member-role').value = member.role || '';
+    
+    const form = document.getElementById('member-form');
+    form.dataset.editIndex = index;
+    form.querySelector('button[type="submit"]').textContent = '✅ Update Member';
+    
+    openModal('member-modal');
 }
 
 function setupModalControls() {

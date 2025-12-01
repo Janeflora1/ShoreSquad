@@ -1328,12 +1328,66 @@ iframe[src*="tawk.to"],
     padding: 1.25rem;
     transition: all 0.3s ease;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    position: relative;
 }
 
 .member-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
     border-color: var(--color-primary);
+}
+
+.edit-member-btn,
+.delete-member-btn,
+.edit-cleanup-btn,
+.delete-cleanup-btn {
+    position: absolute;
+    top: 0.75rem;
+    background: rgba(0, 0, 0, 0.08);
+    border: none;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    opacity: 0;
+}
+
+.member-card:hover .edit-member-btn,
+.member-card:hover .delete-member-btn,
+.cleanup-card:hover .edit-cleanup-btn,
+.cleanup-card:hover .delete-cleanup-btn {
+    opacity: 1;
+}
+
+.edit-member-btn,
+.edit-cleanup-btn {
+    right: 3.5rem;
+    background: rgba(0, 102, 204, 0.1);
+    color: var(--color-primary);
+}
+
+.edit-member-btn:hover,
+.edit-cleanup-btn:hover {
+    background: rgba(0, 102, 204, 0.2);
+    transform: scale(1.1);
+}
+
+.delete-member-btn,
+.delete-cleanup-btn {
+    right: 0.75rem;
+    background: rgba(255, 0, 0, 0.1);
+    color: #e74c3c;
+}
+
+.delete-member-btn:hover,
+.delete-cleanup-btn:hover {
+    background: rgba(255, 0, 0, 0.2);
+    transform: scale(1.1);
 }
 
 .member-avatar {
@@ -1373,6 +1427,7 @@ iframe[src*="tawk.to"],
     padding: 1.25rem;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
     transition: all 0.3s ease;
+    position: relative;
 }
 
 .cleanup-card:hover {
