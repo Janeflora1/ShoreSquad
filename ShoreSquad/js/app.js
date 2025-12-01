@@ -228,24 +228,6 @@ function setupCTAButton() {
     }
 }
 
-// Invite Crew Handler
-function setupInviteCrew() {
-    const inviteBtn = document.getElementById('invite-crew');
-    if (inviteBtn) {
-        inviteBtn.addEventListener('click', () => {
-            const name = prompt('Enter crew member name:');
-            if (name) {
-                const email = prompt('Enter crew member email:');
-                if (email) {
-                    appState.addCrewMember(name, email);
-                    appState.updateUI();
-                    showNotification(`${name} added to your crew!`, 'success');
-                }
-            }
-        });
-    }
-}
-
 // ===========================
 // NOTIFICATIONS
 // ===========================
@@ -790,7 +772,6 @@ document.addEventListener('DOMContentLoaded', () => {
     addAnimations();
     setupNavigation();
     setupCTAButton();
-    setupInviteCrew();
     setupWeatherForecast();
     setupBeachSelector();
     setupMobileMenu();
