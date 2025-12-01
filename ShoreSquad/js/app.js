@@ -186,100 +186,6 @@ function setupInviteCrew() {
     }
 }
 
-// Weather Search Handler
-function setupWeatherSearch() {
-    const searchBtn = document.getElementById('search-weather');
-    const locationInput = document.getElementById('location-input');
-    
-    if (searchBtn && locationInput) {
-        const handleSearch = () => {
-            const location = locationInput.value.trim();
-            if (location) {
-                fetchWeatherData(location);
-            } else {
-                showNotification('Please enter a location', 'error');
-            }
-        };
-
-        searchBtn.addEventListener('click', handleSearch);
-        locationInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') handleSearch();
-        });
-    }
-}
-
-// ===========================
-// WEATHER INTEGRATION
-// ===========================
-
-async function fetchWeatherData(location) {
-    try {
-        showNotification('Fetching weather data...', 'info');
-        
-        // Using Open-Meteo free API (no API key needed)
-        const geocodeUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(location)}&count=1&language=en&format=json`;
-        
-        const geoResponse = await fetch(geocodeUrl);
-        const geoData = await geoResponse.json();
-
-        if (!geoData.results || geoData.results.length === 0) {
-            showNotification('Location not found', 'error');
-            return;
-        }
-
-        const { latitude, longitude, name, country } = geoData.results[0];
-        
-        // Get weather data
-        const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,weather_code&temperature_unit=celsius&timezone=auto`;
-        
-        const weatherResponse = await fetch(weatherUrl);
-        const weatherData = await weatherResponse.json();
-
-        displayWeatherData(weatherData, name, country);
-        showNotification('Weather data loaded!', 'success');
-    } catch (error) {
-        console.error('Weather fetch error:', error);
-        showNotification('Failed to fetch weather data', 'error');
-    }
-}
-
-function displayWeatherData(data, location, country) {
-    const resultsContainer = document.getElementById('weather-results');
-    
-    const current = data.current;
-    const daily = data.daily;
-    
-    let html = `
-        <div class="weather-info">
-            <h3>${location}, ${country}</h3>
-            <div class="current-weather">
-                <p><strong>Temperature:</strong> ${current.temperature_2m}°C</p>
-                <p><strong>Humidity:</strong> ${current.relative_humidity_2m}%</p>
-                <p><strong>Wind Speed:</strong> ${current.wind_speed_10m} km/h</p>
-            </div>
-            <h4>7-Day Forecast</h4>
-            <div class="forecast-grid">
-    `;
-
-    for (let i = 0; i < 7; i++) {
-        html += `
-            <div class="forecast-day">
-                <p><strong>${new Date(daily.time[i]).toDateString()}</strong></p>
-                <p>High: ${daily.temperature_2m_max[i]}°C</p>
-                <p>Low: ${daily.temperature_2m_min[i]}°C</p>
-                <p>Rain: ${daily.precipitation_sum[i]}mm</p>
-            </div>
-        `;
-    }
-
-    html += `
-            </div>
-        </div>
-    `;
-
-    resultsContainer.innerHTML = html;
-}
-
 // ===========================
 // NOTIFICATIONS
 // ===========================
@@ -422,7 +328,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setupNavigation();
     setupCTAButton();
     setupInviteCrew();
-    setupWeatherSearch();
     setupMobileMenu();
     setupGeolocation();
     observeElements();
